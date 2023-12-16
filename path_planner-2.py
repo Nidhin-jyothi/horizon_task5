@@ -9,6 +9,7 @@ import csv
 import os
 import ast
 import itertools
+import math
 
 image_path=""
 
@@ -101,6 +102,8 @@ class WeightedGraph:
 
         # Create a figure and axis for plotting
         fig, ax = plt.subplots()
+        ax.set_xlim(0,img.width)
+        ax.set_ylim(0,img.height)
 
         # Iterate over nodes to plot them
         for point in self.points:
@@ -360,8 +363,8 @@ class ImageClick:
 
         # Adjust aspect ratio and set axis limits
         self.ax.set_aspect('equal', adjustable='box')
-        self.ax.set_xlim(self.img.width, 0)
-        self.ax.set_ylim(self.img.height, 0)
+        self.ax.set_xlim(0,self.img.width)
+        self.ax.set_ylim(0,self.img.height)
 
         plt.show()
 
@@ -411,6 +414,32 @@ def select_points(graph):
         # Pass the named points to the second program
         weighted_graph = integrate_with_second_program(named_points)
 
+
+def get_directions(named_points, shortest_path):
+    shortest_coords = [named_points[x] for x in shortest_path]
+    currenttheta = float(input("Enter the current orientation in degrees with respect to the x-axis: "))
+
+    directions = []
+    for i in range(len(shortest_coords)-1):
+        initial = shortest_coords[i]
+        final = shortest_coords[i+1]
+
+        deltax = final[0] - initial[0]
+        deltay = final[1] - initial[1] 
+
+        theta = math.degrees(math.atan2(deltay, deltax))
+        distance = math.sqrt(deltax**2 + deltay**2)
+        
+
+        
+        directions.append(((theta-currenttheta), distance))
+
+        
+        
+        print(f"Turn {theta-currenttheta} degrees and travel {distance} units.")
+
+        currenttheta = theta
+
 def integrate_with_second_program(named_points):
 
 
@@ -435,10 +464,16 @@ def integrate_with_second_program(named_points):
         print(f"Shortest path covering all nodes with fixed start '{start_node}' and end '{end_node}': {' -> '.join(shortest_path)}")
         print(f"Total distance: {shortest_distance}")
 
+        get_directions(named_points, shortest_path)
+
         weighted_graph.visualize_graph_on_image(named_points=named_points,highlight_path=shortest_path)
 
     else:
         print("No valid path found.")
+
+    
+
+    
 
 # Create an empty graph
 graph1 = Graph()
